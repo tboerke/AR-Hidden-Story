@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <!-- These two lines load the AR libraries. Don't change them. -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+
+<body style="margin: 0; overflow: hidden;">
+
+  <!--
+    imageTargetSrc points to your targets.mind file.
+    Since it's in the same folder/repo as this page, "./targets.mind" works.
+  -->
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets.mind;"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <!-- The video lives here. Muted + playsinline is needed for phones to autoplay it. -->
+    <a-assets>
+      <video
+        id="arVideo"
+        src="./video.mp4"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        preload="auto"
+      ></video>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- targetIndex: 0 means the first (and usually only) image inside targets.mind -->
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
+
+      <!--
+        This is the video plane placed on top of the image.
+        width and height set the shape of the plane.
+        Since the video is vertical 16:9 (9 wide, 16 tall), we use a matching ratio.
+        If your target image is a different shape, change these two numbers to match it.
+      -->
+      <a-video
+        src="#arVideo"
+        width="1"
+        height="1.778"
+        position="0 0 0"
+        rotation="0 0 0"
+      ></a-video>
+
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    // This makes the video play only while the target image is visible,
+    // and pause when it goes out of view.
+    const target = document.querySelector("#target");
+    const video = document.querySelector("#arVideo");
+
+    target.addEventListener("targetFound", () => {
+      video.play();
+    });
+
+    target.addEventListener("targetLost", () => {
+      video.pause();
+    });
+  </script>
+
+</body>
+</html>
